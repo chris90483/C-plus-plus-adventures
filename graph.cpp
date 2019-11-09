@@ -16,9 +16,13 @@ class Graph {
     public:
         Node* nodes;
         Edge* edges;
-        Graph(int max_nodes, int max_edges): 
-            nodes {new Node[max_nodes]},
-            edges {new Edge[max_edges]}{};
+        const int max_nodes;
+        const int max_edges;
+        Graph(int max_nodes_arg, int max_edges_arg): 
+            nodes {new Node[max_nodes_arg]},
+            edges {new Edge[max_edges_arg]},
+            max_nodes{max_nodes_arg},
+            max_edges{max_edges_arg}{};
         ~Graph() {
             delete[] edges;
             delete[] nodes;
@@ -36,7 +40,7 @@ class Graph {
 // functions
 void add_node(Graph& graph, int id) {
     auto i = graph.get_amount_nodes(); // next position to write to
-    if (i < sizeof(graph.nodes)/sizeof(Node)) {
+    if (i < graph.max_nodes) {
         graph.nodes[i] = Node{ id };
         graph.inc_amount_nodes();
     } else {
@@ -46,7 +50,7 @@ void add_node(Graph& graph, int id) {
 
 void add_edge(Graph& graph, Node* node_a, Node* node_b, int weight) {
     auto i = graph.get_amount_edges(); // next position to write to
-    if (i < sizeof(graph.edges)/sizeof(Edge)) {
+    if (i < graph.max_edges) {
         graph.edges[i] = Edge{ node_a, node_b, weight };
         graph.inc_amount_edges();
     } else {
@@ -59,12 +63,13 @@ void show_status(Graph& g) {
     std::cout << " #nodes: " << g.get_amount_nodes();
     std::cout << " #edges: " << g.get_amount_edges();
     std::cout << " |";
-    std::cout << " max nodes: " << sizeof(g.nodes)/sizeof(Node);
-    std::cout << " max edges: " << sizeof(g.edges)/sizeof(Edge) << "\n";
+    std::cout << " max nodes: " << g.max_nodes;
+    std::cout << " max edges: " << g.max_edges << "\n";
 }
 
+
 int main() {
-    Graph graph { Graph(128, 128) };
+    Graph graph { Graph(16, 32) };
     show_status(graph);
 
     add_node(graph, 5);
@@ -79,7 +84,8 @@ int main() {
     add_edge(graph, &graph.nodes[0], &graph.nodes[1], 10);
     show_status(graph);
     
-    std::cout << "Made a graph with a node with id " << graph.nodes[0].id << "\n";
+    Edge* e = &graph.edges[0];
+    std::cout << "The graph has an edge from node " << e->node_a->id << " to node " << e->node_b->id << " with weight " << e->weight << "\n";
     return 0;
 }
 
